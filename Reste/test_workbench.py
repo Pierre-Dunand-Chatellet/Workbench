@@ -569,6 +569,21 @@ def test_textes_lisibles_sur_l_accent(tmpdir):
     app._fermer()
 
 
+def test_etiquette_taille_d_origine_visible(tmpdir):
+    """En reduisant, l'etiquette « taille d'origine » etait posee au-dessus du cadre pointille,
+    hors du canevas: coupee en haut de l'apercu."""
+    tmp = pathlib.Path(tmpdir)
+    app = _app([_image(tmp / "p.png", "1600x1000")], "taille")
+    haut = int(app.cv_taille["height"])
+    for pct in (60, 150):
+        app._dessiner_apercu_taille(1600 * pct // 100, 1000 * pct // 100, pct)
+        y = [app.cv_taille.coords(i)[1] for i in app.cv_taille.find_all()
+             if app.cv_taille.type(i) == "text"
+             and app.cv_taille.itemcget(i, "text") == "taille d'origine"]
+        assert y and 9 <= y[0] <= haut - 9, (pct, y, haut)
+    app._fermer()
+
+
 if __name__ == "__main__":
     test_px()
     test_etiquettes_nettete()
@@ -584,7 +599,7 @@ if __name__ == "__main__":
                   test_zip_sans_media, test_archives_extraire_la_selection,
                   test_archives_envoyer_vers_convertir, test_panneau_securite,
                   test_accueil_grise_selon_depot, test_archives_creer_un_zip,
-                  test_textes_lisibles_sur_l_accent):
+                  test_textes_lisibles_sur_l_accent, test_etiquette_taille_d_origine_visible):
         with tempfile.TemporaryDirectory() as d:
             essai(d)
         print(f"  {essai.__name__} : ok")

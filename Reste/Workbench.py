@@ -1149,7 +1149,9 @@ class Studio(TkinterDnD.Tk):
                 cv.create_rectangle(x0, y0, x0 + ol, y0 + oh, outline=couleur, width=larg,
                                     dash=(6, 4))
             txt = "taille d'origine"
-            ty = y0 + oh + 11 if oh + 24 < max(vh, oh) else y0 - 11   # dedans si la place manque
+            # sous le cadre s'il reste de la place (agrandissement), sinon dans son bas: au-dessus
+            # (y0 - 11) elle sortait du canevas des qu'on reduisait, coupee en haut de l'apercu
+            ty = y0 + oh + 11 if oh + 24 < max(vh, oh) else y0 + oh - 11
             cv.create_rectangle(x0 + 3, ty - 9, x0 + 11 * len(txt), ty + 9, fill="#FFFFFF", outline="")
             cv.create_text(x0 + 8, ty, text=txt, anchor="w", font=mono(9), fill=ACCENT)
 
