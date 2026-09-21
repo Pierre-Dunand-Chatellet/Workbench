@@ -1,0 +1,9 @@
+# Workbench — dépendances Python
+# Le moteur média est ffmpeg, qui n'est PAS un paquet pip : il doit être dans le PATH.
+pillow           # lecture/écriture image, redimensionnement, netteté, profils ICC
+tkinterdnd2      # glisser-déposer de fichiers sur la fenêtre Tkinter
+onnxruntime      # exécution du modèle u2net pour le détourage
+numpy            # préparation des tenseurs envoyés à u2net
+
+# Facultatif : ouvre les .heic/.heif des iPhone
+# pillow-heif

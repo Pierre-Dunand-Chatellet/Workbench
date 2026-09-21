@@ -1,0 +1,8 @@
+# sortie de build.ps1 (exe + ffmpeg embarque, ~530 Mo) : regenerable, jamais versionnee
+dist/
+
+# intermediaires PyInstaller et Python, supprimes par build.ps1
+build/
+*.spec
+__pycache__/
+Reste/logo.ico
