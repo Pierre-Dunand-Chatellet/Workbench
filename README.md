@@ -23,7 +23,7 @@ sous licence GPL v3 : texte joint dans `ffmpeg\LICENSE.txt`, sources sur
 ## Lancer depuis les sources
 
 ```
-cd Reste
+cd src
 pip install -r requirements.txt
 python Workbench.py
 ```
@@ -33,7 +33,7 @@ python Workbench.py
 | | |
 |---|---|
 | Python | 3.11 ou plus |
-| Paquets | `pip install -r Reste/requirements.txt` |
+| Paquets | `pip install -r src/requirements.txt` |
 | **ffmpeg** | dans le `PATH` pour lancer depuis les sources — **pas un paquet pip**. Le `.exe`, lui, l'embarque |
 | Windows Defender | facultatif : sans lui, l'analyse de sécurité ne fait que sa partie locale |
 
@@ -98,7 +98,7 @@ au pixel près.
 
 ## Tests
 
-À lancer depuis `Reste\` :
+À lancer depuis `src\` :
 
 ```
 python test_convert.py      # moteur : conversions réelles, qualité, GIF animé, annulation, délais
@@ -115,7 +115,7 @@ Tout s'exécute sans framework : `assert` et `python fichier.py`.
 
 ## Construire le .exe
 
-Depuis `Reste\` :
+Depuis `src\` :
 
 ```powershell
 pip install pyinstaller
@@ -159,7 +159,7 @@ Choix assumés :
 ```
 Workbench\
   README.md
-  Reste\                 les sources
+  src\                   les sources
     Workbench.py         interface Tkinter, les six panneaux
     convert.py           moteur : ffmpeg, Pillow, u2net. Aucune dépendance à Tk
     archives.py          zip : lister, extraire, extraire les médias, créer, garde-fous

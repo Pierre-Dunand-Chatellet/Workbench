@@ -5,4 +5,4 @@ dist/
 build/
 *.spec
 __pycache__/
-Reste/logo.ico
+src/logo.ico

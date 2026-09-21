@@ -1,4 +1,4 @@
-﻿# Construit ..\dist\Workbench\Workbench.exe (dans le dossier du projet, à côté de Reste\) puis le vérifie.
+﻿# Construit ..\dist\Workbench\Workbench.exe (dans le dossier du projet, à côté de src\) puis le vérifie.
 #   .\build.ps1            construit et teste
 #   .\build.ps1 -SansTest  construit seulement
 #
@@ -10,8 +10,8 @@ param([switch]$SansTest)
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
 $nom = "Workbench"
-# Sortie dans le dossier du projet, pas dans Reste\ : avant, Set-Location + "dist" posait
-# l'exe dans Reste\dist alors que le raccourci et le README pointent sur ..\dist.
+# Sortie dans le dossier du projet, pas dans src\ : avant, Set-Location + "dist" posait
+# l'exe dans src\dist alors que le raccourci et le README pointent sur ..\dist.
 $dist = Join-Path (Split-Path $PSScriptRoot -Parent) "dist"
 
 Write-Host "== nettoyage ==" -ForegroundColor Cyan
