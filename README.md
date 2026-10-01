@@ -132,7 +132,9 @@ fuseaux horaires de Tcl (77 Mo), que Tkinter ne lit jamais.
 Le `.exe` **embarque ffmpeg et ffprobe** (build « full » de gyan.dev, copié depuis cette
 machine par `build.ps1`, ~445 Mo, licence GPL jointe) dans `dist\Workbench\ffmpeg\` : rien à
 installer sur la machine cible, et c'est toujours ce ffmpeg-là que le `.exe` utilise. Le
-**modèle** n'est pas embarqué : il se télécharge au premier détourage. Un raccourci
+**modèle** n'est pas embarqué : il se télécharge au premier détourage. Le build livre aussi
+`dist\Workbench\fonts\` (Syne, Geist, JetBrains Mono) : `--smoke` vérifie qu'elles sont chargées.
+Un raccourci
 `Workbench.lnk` du menu Démarrer pointe sur `dist\Workbench\Workbench.exe`.
 
 ## Interface
@@ -142,11 +144,16 @@ dépose grise les outils qui ne s'y appliquent pas (avec la raison) ; un clic su
 allumée ouvre l'outil avec ce qui le concerne. Pas de barre latérale : le logo et
 « ‹ Tous les outils » ramènent à l'accueil.
 
-Palette : fond `#F2F2F3`, carte `#FFFFFF`, texte `#121316`, ligne `#DADBDF`, accent violet
-`#4B3FCF` + touche jaune `#FFCE6B` ; polices Outfit + JetBrains Mono. Teintes des outils :
-Archives pêche/brun (`#F8E6D8` / `#8A5A2E`), Sécurité rouge doux (`#FBE3E1` / `#B03A32`).
-Logo : un B fait de deux tiroirs, `logo.svg` et `image_logo()` (même dessin) ; `build.ps1`
-en tire `logo.ico` pour le `.exe`.
+Palette (même famille que le portfolio, version claire) : fond « papier » `#E7E2D7`, carte
+`#F3EFE6`, texte « encre » `#16130F`, ligne `#C4BDAC`, accent aubergine `#6B2A8F`. Polices :
+Syne ExtraBold pour les titres (en capitales, jamais sur des chiffres : son « 1 » ressemble à un
+« I »), Geist pour le texte, JetBrains Mono pour les boutons, les tailles et les chemins. Elles sont
+livrées dans `src\fonts\` (licence SIL OFL, texte dans `LICENCES.txt`), copiées à côté du `.exe` par
+`build.ps1` et enregistrées au démarrage pour le seul processus (`AddFontResourceExW` : rien n'est
+installé sur la machine). Sans elles, l'appli retombe sur Segoe UI et Consolas. Teintes des outils :
+Convertir aubergine, Enlever le fond bleu encre, Redimensionner vert, Netteté ocre, Archives
+pêche/brun, Sécurité rouge doux. Logo : un B fait de deux tiroirs (pastille aubergine, tiroirs
+crème), `logo.svg` et `image_logo()` (même dessin) ; `build.ps1` en tire `logo.ico` pour le `.exe`.
 
 Choix assumés :
 - pas de **PDF** en sortie de conversion — cela demanderait une dépendance de plus ;
@@ -170,6 +177,7 @@ Workbench\
     test_workbench.py    tests de l'interface
     build.ps1            construction du .exe (source de vérité, pas le .spec)
     logo.svg             le logo en vectoriel
+    fonts\               Syne, Geist, JetBrains Mono (.ttf statiques) et LICENCES.txt (SIL OFL)
     requirements.txt
   dist\Workbench\        sortie PyInstaller — régénérable, ne pas versionner
 ```

@@ -68,26 +68,26 @@ import archives                                           # noqa: E402
 import convert                                            # noqa: E402
 import securite                                           # noqa: E402
 
-# Palette
-BG, CARD, LINE = "#F2F2F3", "#FFFFFF", "#DADBDF"
-SOFT, SOFT_LINE = "#F7F7F8", "#E6E7EA"
-# accent violet + jaune (2026-09-21). Variante essayee: orange #FC6C26 + creme #FFF8DF, mais
-# un texte blanc sur cet orange tombe a 2,9:1 de contraste (illisible sur les boutons).
-ACCENT, ACCENT_DARK, ACCENT_PALE = "#4B3FCF", "#3A2FB0", "#ECEAFB"
-ACCENT2 = "#FFCE6B"   # touche jaune : poignees du logo, rond de la zone de depot
-TXT, TXT2, MUTED = "#121316", "#44474F", "#6E717A"
-VERT, VERT_PALE = "#2F7D55", "#DCF0E6"
-PECHE, PECHE_LINE, BRUN = "#F8E6D8", "#F0D6C2", "#8A5A2E"     # outil Archives (maquette)
-ROUGE_PALE, ROUGE, ROUGE_TXT = "#FBE3E1", "#B03A32", "#8C2F28"  # outil Sécurité (maquette)
-AMBRE_PALE, AMBRE = "#FBECC4", "#8A6410"
-TIRET = "#C4C6CC"
-DAMIER = "#E4E5E8"
+# Palette : même famille que le portfolio (papier / encre / aubergine), version claire. Les contrastes
+# texte sont mesurés (encre 14:1 sur le papier, texte discret 5,4:1, blanc sur l'aubergine 8,7:1).
+BG, CARD, LINE = "#E7E2D7", "#F3EFE6", "#C4BDAC"
+SOFT, SOFT_LINE = "#ECE7DC", "#D3CCBB"
+ACCENT, ACCENT_DARK, ACCENT_PALE = "#6B2A8F", "#541F72", "#E6D6EF"
+TXT, TXT2, MUTED = "#16130F", "#4A4438", "#5F5849"
+VERT, VERT_PALE = "#2F6B45", "#D5E6DA"
+PECHE, PECHE_LINE, BRUN = "#EFDCCB", "#E2C9B1", "#8A5A2E"     # outil Archives
+ROUGE_PALE, ROUGE, ROUGE_TXT = "#F1D9D4", "#9C2F2F", "#7E2525"  # outil Sécurité
+AMBRE_PALE, AMBRE = "#F0E2B8", "#7A5A0E"
+TIRET = "#B3AB98"
+DAMIER = "#DDD7C9"
+# pastille de chaque type de média (image, vidéo, son)
+TEINTES = {"image": ACCENT_PALE, "video": VERT_PALE, "audio": AMBRE_PALE}
 
 OUTILS = [
-    ("convert", "Convertir un fichier", "Changer le format", "#E7E3FA", "#5B4FC7", "⇄"),
-    ("fond", "Enlever le fond", "Garder le sujet seul", "#E3E9FA", "#3F5BC7", "✂"),
-    ("taille", "Redimensionner", "Agrandir ou réduire", "#DCF0E6", "#2F7D55", "⤡"),
-    ("nettete", "Améliorer la netteté", "Rendre l'image plus nette", "#FBECC4", "#B8862B", "✦"),
+    ("convert", "Convertir un fichier", "Changer le format", ACCENT_PALE, ACCENT, "⇄"),
+    ("fond", "Enlever le fond", "Garder le sujet seul", "#D9E1EE", "#35508C", "✂"),
+    ("taille", "Redimensionner", "Agrandir ou réduire", VERT_PALE, VERT, "⤡"),
+    ("nettete", "Améliorer la netteté", "Rendre l'image plus nette", AMBRE_PALE, AMBRE, "✦"),
     ("archives", "Archives", "Extraire ou créer un zip", PECHE, BRUN, "▤"),
     ("securite", "Analyse de sécurité", "Vérifier un dossier", ROUGE_PALE, ROUGE, "⛨"),
 ]
@@ -120,6 +120,29 @@ MARGES = 130       # paddings cumules entre les trois colonnes
 _FAM = {}
 
 
+def _dossier_polices():
+    """Les polices livrées avec l'appli : dans dist\\Workbench\\fonts (comme ffmpeg) pour le .exe, dans src\\fonts sinon."""
+    base = pathlib.Path(sys.executable).parent if getattr(sys, "frozen", False) else pathlib.Path(__file__).resolve().parent
+    return base / "fonts"
+
+
+def _charger_polices():
+    """Enregistre Syne, Geist et JetBrains Mono pour CE processus seulement (FR_PRIVATE) : rien n'est installé sur la
+    machine et elles disparaissent à la fermeture. À faire avant de créer la fenêtre. Sans elles (ou hors Windows),
+    l'appli retombe sur Segoe UI et Consolas."""
+    if os.name != "nt":
+        return
+    try:
+        import ctypes
+        for ttf in sorted(_dossier_polices().glob("*.ttf")):
+            ctypes.windll.gdi32.AddFontResourceExW(str(ttf), 0x10, 0)
+    except Exception:
+        pass
+
+
+_charger_polices()
+
+
 # ---------------------------------------------------------------- petits outils
 def police(size, weight="normal"):
     return (_FAM.get("ui", "Segoe UI"), size, weight)
@@ -127,6 +150,13 @@ def police(size, weight="normal"):
 
 def mono(size):
     return (_FAM.get("mono", "Consolas"), size)
+
+
+def police_titre(size):
+    """Grands titres : Syne ExtraBold comme sur le portfolio (à écrire en capitales, et sans chiffres : son « 1 »
+    ressemble à un « I »). Sans la police, l'interface en gras."""
+    fam = _FAM.get("titre")
+    return (fam, size) if fam else (_FAM.get("ui", "Segoe UI"), size, "bold")
 
 
 def poids(n):
@@ -152,14 +182,14 @@ class _Primaire(tk.Button):
 
 def bouton(parent, texte, cmd, primaire=False, petit=False, **kw):
     return (_Primaire if primaire else tk.Button)(
-        parent, text=texte, command=cmd, relief="flat", bd=0, cursor="hand2",
+        parent, text=texte.upper(), command=cmd, relief="flat", bd=0, cursor="hand2",
         bg=ACCENT if primaire else SOFT, fg="#FFFFFF" if primaire else TXT,
         activebackground=ACCENT_DARK if primaire else SOFT_LINE,
         activeforeground="#FFFFFF" if primaire else TXT,
         disabledforeground=MUTED, highlightthickness=0 if primaire else 1,
         highlightbackground=LINE,
-        font=police(10 if petit else 11, "bold" if primaire else "normal"),
-        padx=12 if petit else 18, pady=6 if petit else 10, **kw)
+        font=mono(9 if petit else 10),
+        padx=12 if petit else 18, pady=7 if petit else 11, **kw)
 
 
 def label(parent, texte, size=11, couleur=TXT, weight="normal", bg=CARD, **kw):
@@ -195,10 +225,10 @@ def image_logo(cote):
     s = lambda *v: [a * k for a in v]
     d.rounded_rectangle(s(0, 0, 64, 64), radius=16 * k, fill=ACCENT)
     for haut, bas, fin in ((14, 31, 33.5), (33, 50, 37.5)):    # tiroir du haut, du bas
-        d.rectangle(s(18, haut, fin, bas), fill="#FFFFFF")
-        d.ellipse(s(fin - 8.5, haut, fin + 8.5, bas), fill="#FFFFFF")
+        d.rectangle(s(18, haut, fin, bas), fill=CARD)
+        d.ellipse(s(fin - 8.5, haut, fin + 8.5, bas), fill=CARD)
         m = (haut + bas) / 2                                        # poignee
-        d.rounded_rectangle(s(fin - 10.5, m - 1.5, fin - 1.5, m + 1.5), radius=1.5 * k, fill=ACCENT2)
+        d.rounded_rectangle(s(fin - 10.5, m - 1.5, fin - 1.5, m + 1.5), radius=1.5 * k, fill=ACCENT)
     return im.resize((cote, cote), Image.LANCZOS)
 
 
@@ -436,8 +466,9 @@ class Studio(TkinterDnD.Tk):
         self.configure(bg=BG)
 
         familles = set(tkfont.families())
-        _FAM["ui"] = "Outfit" if "Outfit" in familles else "Segoe UI"
+        _FAM["ui"] = "Geist" if "Geist" in familles else "Segoe UI"
         _FAM["mono"] = "JetBrains Mono" if "JetBrains Mono" in familles else "Consolas"
+        _FAM["titre"] = "Syne ExtraBold" if "Syne ExtraBold" in familles else None
 
         self.fichiers = []        # liste de pathlib.Path
         self.infos = {}           # probe du fichier affiche
@@ -518,7 +549,7 @@ class Studio(TkinterDnD.Tk):
         tete.pack(side="left", padx=(22, 0))
         l1 = tk.Label(tete, image=self.logo, bg=CARD)
         l1.pack(side="left", padx=(0, 10))
-        l2 = label(tete, "Workbench", 14, TXT, "bold")
+        l2 = tk.Label(tete, text="WORKBENCH", font=police_titre(12), fg=TXT, bg=CARD)
         l2.pack(side="left")
         for w in (tete, l1, l2):                      # le logo ramene a l'accueil
             w.bind("<Button-1>", lambda _e: self._afficher("accueil"))
@@ -528,7 +559,7 @@ class Studio(TkinterDnD.Tk):
 
         self.chip = tk.Frame(barre, bg=SOFT, highlightbackground=SOFT_LINE, highlightthickness=1)
         self.chip.pack(side="left", padx=22, pady=14)
-        self.chip_icone = tk.Frame(self.chip, bg="#E7E3FA", width=24, height=24)
+        self.chip_icone = tk.Frame(self.chip, bg=ACCENT_PALE, width=24, height=24)
         self.chip_icone.pack(side="left", padx=(9, 10), pady=6)
         self.chip_icone.pack_propagate(False)
         self.chip_nom = label(self.chip, "Aucun fichier", 11, TXT, "normal", SOFT)
@@ -728,8 +759,7 @@ class Studio(TkinterDnD.Tk):
             self.chip_dim.configure(text="")
             return
         f = self.fichiers[0]
-        tint = {"image": "#E7E3FA", "video": "#DCF0E6", "audio": "#FBECC4"}
-        self.chip_icone.configure(bg=tint.get(convert.media_kind(f), SOFT))
+        self.chip_icone.configure(bg=TEINTES.get(convert.media_kind(f), SOFT))
         suite = f"  +{len(self.fichiers) - 1}" if len(self.fichiers) > 1 else ""
         self.chip_nom.configure(text=f.name + suite)
         w, h, d = self.infos.get("width"), self.infos.get("height"), self.infos.get("duration")
@@ -771,7 +801,7 @@ class Studio(TkinterDnD.Tk):
          "archives": self._p_archives, "securite": self._p_securite}[outil](p)
 
     def _entete(self, p, titre, sous):
-        label(p, titre, 21, TXT, "bold").pack(anchor="w", padx=30, pady=(26, 3))
+        tk.Label(p, text=titre.upper(), font=police_titre(19), fg=TXT, bg=CARD).pack(anchor="w", padx=30, pady=(26, 5))
         label(p, sous, 11, MUTED).pack(anchor="w", padx=30, pady=(0, 18))
 
     def _zone_depot(self, p, titre="Glissez vos fichiers ici",
@@ -785,7 +815,7 @@ class Studio(TkinterDnD.Tk):
             zone.delete("all")
             w = zone.winfo_width() or 700
             zone.create_rectangle(2, 2, w - 3, 205, outline=TIRET, dash=(7, 5), width=2)
-            zone.create_oval(w // 2 - 26, 34, w // 2 + 26, 86, fill=ACCENT2, outline="")
+            zone.create_oval(w // 2 - 26, 34, w // 2 + 26, 86, fill=ACCENT_PALE, outline="")
             zone.create_text(w // 2, 60, text="↑", font=police(20, "bold"), fill=ACCENT)
             zone.create_text(w // 2, 112, text=titre, font=police(15, "bold"), fill=TXT)
             zone.create_text(w // 2, 138, text=sous, font=police(10), fill=MUTED)
@@ -927,8 +957,7 @@ class Studio(TkinterDnD.Tk):
     def _ligne_conversion(self, p, f):
         ligne = carte(p, bg=SOFT, bordure=SOFT_LINE)
         ligne.pack(fill="x", padx=30, pady=3)
-        tint = {"image": "#E7E3FA", "video": "#DCF0E6", "audio": "#FBECC4"}
-        pastille = tk.Frame(ligne, bg=tint.get(convert.media_kind(f), SOFT), width=30, height=30)
+        pastille = tk.Frame(ligne, bg=TEINTES.get(convert.media_kind(f), SOFT), width=30, height=30)
         pastille.pack(side="left", padx=12, pady=11)
         pastille.pack_propagate(False)
         bloc = tk.Frame(ligne, bg=SOFT)
@@ -2100,7 +2129,7 @@ class Studio(TkinterDnD.Tk):
 
         n = len(produits)
         total = sum(p.stat().st_size for p in produits)
-        label(f, "C'est prêt !", 18, TXT, "bold").pack(anchor="w", padx=20, pady=(16, 2))
+        tk.Label(f, text="C'EST PRÊT !", font=police_titre(15), fg=TXT, bg=CARD).pack(anchor="w", padx=20, pady=(16, 4))
         titre = produit.name if n == 1 else f"{n} fichiers, à commencer par « {produit.name} »"
         label(f, f"{titre} · {poids(total)}", 11, TXT2).pack(anchor="w", padx=20)
         label(f, f"enregistré dans « {produit.parent} »", 10, MUTED).pack(
@@ -2212,6 +2241,10 @@ def _smoke(app):
         for cle in ["accueil"] + [o[0] for o in OUTILS]:
             app._afficher(cle)
             lignes.append(f"panneau {cle} : ok")
+        # les polices livrées à côté du .exe (build.ps1) doivent avoir été chargées
+        manquantes = [n for n in ("Geist", "Syne ExtraBold", "JetBrains Mono") if n not in set(tkfont.families())]
+        assert not manquantes, f"polices livrées non chargées : {manquantes}"
+        lignes.append("polices du portfolio : ok")
         d = pathlib.Path(tempfile.mkdtemp())
         src = d / "test.png"
         Image.new("RGB", (200, 150), (90, 120, 60)).save(src)

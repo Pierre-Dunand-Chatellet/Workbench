@@ -74,6 +74,11 @@ $licence = Join-Path (Split-Path $bin) "LICENSE"
 if (Test-Path $licence) { Copy-Item $licence "$ff\LICENSE.txt" }
 Write-Host "ffmpeg embarqué depuis $bin" -ForegroundColor Cyan
 
+# polices du portfolio (Syne, Geist, JetBrains Mono, licence OFL) : à côté du .exe, comme ffmpeg. Workbench.py les
+# enregistre au démarrage pour son seul processus ; LICENCES.txt voyage avec elles, c'est une condition de la licence.
+Copy-Item "$PSScriptRoot\fonts" "$dist\$nom\fonts" -Recurse -Force
+Write-Host "polices copiées dans $dist\$nom\fonts" -ForegroundColor Cyan
+
 # intermédiaires : régénérés à chaque build, ils n'ont rien à faire dans le dossier.
 # La source de vérité est CE script, pas le .spec que PyInstaller vient d'écrire.
 Remove-Item "build" -Recurse -Force -ErrorAction SilentlyContinue

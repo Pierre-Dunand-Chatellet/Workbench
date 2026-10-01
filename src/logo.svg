@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
   <!-- Workbench : un B fait de deux tiroirs d'établi. Même dessin que image_logo() dans Workbench.py -->
-  <rect width="64" height="64" rx="16" fill="#4B3FCF"/>
-  <path d="M18 14H33.5a8.5 8.5 0 0 1 0 17H18z" fill="#fff"/>
-  <path d="M18 33H37.5a8.5 8.5 0 0 1 0 17H18z" fill="#fff"/>
-  <path d="M24.5 22.5h6M28.5 41.5h6" stroke="#FFCE6B" stroke-width="3" stroke-linecap="round"/>
+  <rect width="64" height="64" rx="16" fill="#6B2A8F"/>
+  <path d="M18 14H33.5a8.5 8.5 0 0 1 0 17H18z" fill="#F3EFE6"/>
+  <path d="M18 33H37.5a8.5 8.5 0 0 1 0 17H18z" fill="#F3EFE6"/>
+  <path d="M24.5 22.5h6M28.5 41.5h6" stroke="#6B2A8F" stroke-width="3" stroke-linecap="round"/>
 </svg>
